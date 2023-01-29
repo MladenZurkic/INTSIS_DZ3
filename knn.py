@@ -84,23 +84,22 @@ X_train, X_test, y_train, y_test = train_test_split(data_train, typeOfCake, trai
 
 #----------------------------------------------------------------------------------------
 
-def knn_predict(X_train, X_test, y_train, y_test, k):
-    # Make predictions on the test data
-    # Need output of 1 prediction per test data point
+def knnPredict(X_train, X_test, y_train, y_test, k):
+
     predictions = []
 
-    for index, test_point in X_test.iterrows():
-        distances = np.sqrt(np.sum((X_train.to_numpy() - test_point.to_numpy()) ** 2, axis=1))
+    for index, testPoint in X_test.iterrows():
+        distances = np.sqrt(np.sum((X_train.to_numpy() - testPoint.to_numpy()) ** 2, axis=1))
 
-        nearest_neighbors = np.argsort(distances)[:k]
-        nearest_labels = y_train.iloc[nearest_neighbors]
+        nearestNeighbors = np.argsort(distances)[:k]
+        nearestLabels = y_train.iloc[nearestNeighbors]
 
-        prediction = Counter(nearest_labels).most_common(1)[0][0]
+        prediction = Counter(nearestLabels).most_common(1)[0][0]
         predictions.append(prediction)
 
     return predictions
 
-predictions = knn_predict(X_train, X_test, y_train, y_test, k=5)
+predictions = knnPredict(X_train, X_test, y_train, y_test, k=5)
 
 print("MSE: " + str(mean_squared_error(y_test, predictions)))
 print("Score: " + str(accuracy_score(y_test, predictions)))
