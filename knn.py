@@ -1,4 +1,5 @@
 from collections import Counter
+
 import pandas
 import pandas as pd
 import numpy as np
@@ -8,12 +9,11 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import r2_score
+from sklearn.metrics import mean_squared_error, accuracy_score
 
 
 def correlationMatrixPlot(dataWithCorr):
-    plt.figure('Korelaciona matrica')
+    plt.figure('Korelaciona matrica - KNN algoritam')
     plt.title('Korelaciona matrica')
     plt.tight_layout()
     sb.heatmap(dataWithCorr, annot=True, square=True, fmt=".2f")
@@ -66,15 +66,15 @@ data_train["milk"] = data_train["milk"].map(lambda x: round(x, 4))
 data_train["butter"] = data_train["butter"].map(lambda x: round(x, 4))
 data_train["baking_powder"] = data_train["baking_powder"].map(lambda x: round(x, 4))
 
-print(data_train.head(20))
-#Print HEATMAP
+# print(data_train.head(20))
 
-correlationMatrixPlot(data_train.corr())
+# #Print HEATMAP
+# correlationMatrixPlot(data_train.corr())
 
 # Split data
-X_train, X_test, y_train, y_test = train_test_split(data_train, typeOfCake, train_size=0.7, shuffle=True)
+X_train, X_test, y_train, y_test = train_test_split(data_train, typeOfCake, train_size=0.7, random_state=84, shuffle=True)
 
-# ISPIS GRAFIKA
+# # ISPIS GRAFIKA
 # continualDataPlot("flour")
 # continualDataPlot("eggs")
 # continualDataPlot("sugar")
@@ -83,56 +83,25 @@ X_train, X_test, y_train, y_test = train_test_split(data_train, typeOfCake, trai
 # continualDataPlot("baking_powder")
 
 #----------------------------------------------------------------------------------------
-def minkowski_distance(a, b, p=1):
-    # Store the number of dimensions
-    dim = len(a)
 
-    # Set initial distance to 0
-    distance = 0
-
-    # Calculate minkowski distance using parameter p
-    for d in range(dim):
-        distance += abs(float(a[d]) - float(b[d])) ** p
-
-    distance = distance ** (1 / p)
-
-    return distance
-
-def knn_predict(X_train, X_test, y_train, y_test, k, p):
+def knn_predict(X_train, X_test, y_train, y_test, k):
     # Make predictions on the test data
     # Need output of 1 prediction per test data point
-    y_hat_test = []
+    predictions = []
 
     for index, test_point in X_test.iterrows():
-        distances = []
+        distances = np.sqrt(np.sum((X_train.to_numpy() - test_point.to_numpy()) ** 2, axis=1))
 
-        for train_index, train_point in X_train.iterrows():
-            distance = minkowski_distance(test_point, train_point, p=p)
-            distances.append(distance)
+        nearest_neighbors = np.argsort(distances)[:k]
+        nearest_labels = y_train.iloc[nearest_neighbors]
 
-        # Store distances in a dataframe
-        df_dists = pd.DataFrame(data=distances, columns=['dist'],
-                                index=y_train.index)
+        prediction = Counter(nearest_labels).most_common(1)[0][0]
+        predictions.append(prediction)
 
-        # Sort distances, and only consider the k closest points
-        df_nn = df_dists.sort_values(by=['dist'], axis=0)[:k]
+    return predictions
 
-        # Create counter object to track the labels of k closest neighbors
-        counter = Counter(y_train[df_nn.index])
+predictions = knn_predict(X_train, X_test, y_train, y_test, k=5)
 
-        # Get most common label of all the nearest neighbors
-        prediction = counter.most_common()[0][0]
-
-        # Append prediction to output list
-        y_hat_test.append(prediction)
-
-    return y_hat_test
-
-
-# Make predictions on test dataset
-y_hat_test = knn_predict(X_train, X_test, y_train, y_test, k=5, p=2)
-
-print(y_test)
-print(y_hat_test)
-print("Score: " + str(r2_score(y_test, y_hat_test)))
+print("MSE: " + str(mean_squared_error(y_test, predictions)))
+print("Score: " + str(accuracy_score(y_test, predictions)))
 

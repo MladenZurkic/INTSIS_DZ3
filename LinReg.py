@@ -7,7 +7,6 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 def correlationMatrixPlot(dataWithCorr):
@@ -116,15 +115,15 @@ print(data_train.head(10))
 correlationMatrixPlot(data_train.corr())
 
 # ISPIS GRAFIKA
-# categoricalDataPlot("MAKE")
-# categoricalDataPlot("VEHICLECLASS")
-# continualDataPlot("ENGINESIZE")
-# continualDataPlot("CYLINDERS")
-# categoricalDataPlot("TRANSMISSION")
-# categoricalDataPlot("FUELTYPE")
-# continualDataPlot("FUELCONSUMPTION_CITY")
-# continualDataPlot("FUELCONSUMPTION_HWY")
-# continualDataPlot("FUELCONSUMPTION_COMB")
+categoricalDataPlot("MAKE")
+categoricalDataPlot("VEHICLECLASS")
+continualDataPlot("ENGINESIZE")
+continualDataPlot("CYLINDERS")
+categoricalDataPlot("TRANSMISSION")
+categoricalDataPlot("FUELTYPE")
+continualDataPlot("FUELCONSUMPTION_CITY")
+continualDataPlot("FUELCONSUMPTION_HWY")
+continualDataPlot("FUELCONSUMPTION_COMB")
 
 # ----------------------------------------------------------------------------------------------------------------------
 #Add intercept
@@ -164,99 +163,12 @@ print("Final MSE: ", mseList[-1])
 print("Score: " + str(r2_score(y_test, prediction)))
 
 
-# plt.figure('MS Error')
-# plt.plot(np.arange(0, len(mseList[:100]), 1), mseList[:100])
-# plt.xlabel('Iteration', fontsize=13)
-# plt.ylabel('MS error value', fontsize=13)
-# plt.xticks(np.arange(0, len(mseList[:100]), 2))
-# plt.title('Mean-square error function')
-# plt.tight_layout()
-# plt.legend(['MS Error'])
-# plt.show()
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# KOD SA PREZENTACIJE
-# class LinearRegressionGradientDescent:
-#     def __init__(self):
-#         self.coeff = None
-#         self.features = None
-#         self.target = None
-#         self.mse_history = None
-#
-#     def set_coefficients(self, *args):
-#         self.coeff = np.array(args).reshape(-1, 1)
-#
-#     def cost(self):
-#         predicted = self.features.dot(self.coeff)
-#         s = pow(predicted - self.target, 2).sum()
-#         return (0.5 / len(self.features)) * s
-#
-#     # Argument mora biti DataFrame
-#     def predict(self, features):
-#         features = features.copy(deep=True)
-#         features.insert(0, 'c0', np.ones((len(features), 1)))
-#         features = features.to_numpy()
-#         return features.dot(self.coeff).reshape(-1, 1).flatten()
-#
-#     def gradient_descent_step(self, learning_rate):
-#         # learning_rate - korak ucenja; dimenzije ((n + 1) x 1);
-#         # korak ucenja je razlicit za razlicite koeficijente
-#         # m - broj uzoraka
-#         # n - broj razlicitih atributa (osobina)
-#         # features – dimenzije (m x (n + 1));
-#         # n + 1 je zbog koeficijenta c0
-#         # self.coeff – dimenzije ((n + 1) x 1)
-#         # predicted – dimenzije (m x (n + 1)) x ((n + 1) x 1) = (m x 1)
-#         predicted = self.features.dot(self.coeff)
-#         # koeficijeni se azuriraju po formuli:
-#         # coeff(i) = coeff(i) - learning_rate * gradient(i)
-#         # za i-ti koeficijent koji mnozi i-ti atribut
-#         # gledaju se samo vrednosti i-tog atributa za sve uzorke
-#         # gradient(i) = (1 / m) * sum(y_predicted - y_target) * features(i)
-#
-#         # (predicted - self.target) - dimenzije (m x 1)
-#         # features - dimenzije (m x (n + 1));
-#         # transponovana matrica ima dimenzije ((n + 1) x m)
-#         # gradient - dimenzije ((n + 1) x m) x (m x 1) = (n + 1) x 1
-#         s = self.features.T.dot(predicted - self.target)
-#         gradient = (1. / len(self.features)) * s
-#         self.coeff = self.coeff - learning_rate * gradient
-#         return self.coeff, self.cost()
-#
-#     def perform_gradient_descent(self, learning_rate, num_iterations=1000):
-#             # Istorija Mean-square error-a kroz iteracije gradijentnog spusta.
-#             self.mse_history = []
-#             for i in range(num_iterations):
-#                 _, curr_cost = self.gradient_descent_step(learning_rate)
-#                 self.mse_history.append(curr_cost)
-#             return self.coeff, self.mse_history
-#
-#     # features mora biti DataFrame
-#     def fit(self, features, target):
-#         self.features = features.copy(deep=True)
-#
-#         # Pocetna vrednost za koeficijente je 0.
-#         # self.coeff - dimenzije ((n + 1) x 1)
-#         coeff_shape = len(features.columns) + 1
-#         self.coeff = np.zeros(shape=coeff_shape).reshape(-1, 1)
-#         # Unosi se kolona jedinica za koeficijent c0,
-#         # kao da je vrednost atributa uz c0 jednaka 1.
-#         self.features.insert(0, 'c0', np.ones((len(features), 1)))
-#         # self.features - dimenzije (m x (n + 1))
-#         self.features = self.features.to_numpy()
-#         # self.target - dimenzije (m x 1)
-#         self.target = target.to_numpy().reshape(-1, 1)
-#
-# X_train, X_test, y_train, y_test = train_test_split(data_train, emissions, train_size=0.75, random_state=112, shuffle=False)
-#
-# spots = 200
-# estates = pd.DataFrame(data=np.linspace(0, max(X_train['CYLINDERS']), num=spots))
-# # Kreiranje i obucavanje modela
-# lrgd = LinearRegressionGradientDescent()
-# lrgd.fit(X_train, y_train)
-# learning_rates = np.array([[0.17], [0.0000475], [0.0000475], [0.0000475], [0.0000475], [0.0000475], [0.0000475], [0.0000475]])
-# res_coeff, mse_history = lrgd.perform_gradient_descent(learning_rates, 20)
-#
-# print(1 - mse_history[-1])
-# # --------------------------------------------------------------------------------------------------------------------
+plt.figure('MS Error')
+plt.plot(np.arange(0, len(mseList[:100]), 1), mseList[:100])
+plt.xlabel('Iteration', fontsize=13)
+plt.ylabel('MS error value', fontsize=13)
+plt.xticks(np.arange(0, len(mseList[:100]), 2))
+plt.title('Mean-square error function')
+plt.tight_layout()
+plt.legend(['MS Error'])
+plt.show()

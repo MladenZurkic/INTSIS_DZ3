@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, accuracy_score
 
 
 def correlationMatrixPlot(dataWithCorr):
@@ -55,23 +55,22 @@ data_train = data[['flour', 'eggs', 'sugar', 'milk', 'butter', 'baking_powder']]
 typeOfCake = data['type'] #Series type
 
 # #calculate new values
-# data_train = (data_train - pandas.DataFrame.min(data_train)) / (pandas.DataFrame.max(data_train) - pandas.DataFrame.min(data_train)).values
-#
-# #round float values
-# data_train["flour"] = data_train["flour"].map(lambda x: round(x, 4))
-# data_train["eggs"] = data_train["eggs"].map(lambda x: round(x, 4))
-# data_train["sugar"] = data_train["sugar"].map(lambda x: round(x, 4))
-# data_train["milk"] = data_train["milk"].map(lambda x: round(x, 4))
-# data_train["butter"] = data_train["butter"].map(lambda x: round(x, 4))
-# data_train["baking_powder"] = data_train["baking_powder"].map(lambda x: round(x, 4))
+data_train = (data_train - pandas.DataFrame.min(data_train)) / (pandas.DataFrame.max(data_train) - pandas.DataFrame.min(data_train)).values
+
+#round float values
+data_train["flour"] = data_train["flour"].map(lambda x: round(x, 4))
+data_train["eggs"] = data_train["eggs"].map(lambda x: round(x, 4))
+data_train["sugar"] = data_train["sugar"].map(lambda x: round(x, 4))
+data_train["milk"] = data_train["milk"].map(lambda x: round(x, 4))
+data_train["butter"] = data_train["butter"].map(lambda x: round(x, 4))
+data_train["baking_powder"] = data_train["baking_powder"].map(lambda x: round(x, 4))
 
 print(data_train.head(20))
-#Print HEATMAP
-
-correlationMatrixPlot(data_train.corr())
+# #Print HEATMAP
+# correlationMatrixPlot(data_train.corr())
 
 # Split data
-X_train, X_test, y_train, y_test = train_test_split(data_train, typeOfCake, train_size=0.5, random_state=112, shuffle=False)
+X_train, X_test, y_train, y_test = train_test_split(data_train, typeOfCake, train_size=0.80, random_state=110, shuffle=True)
 
 # ISPIS GRAFIKA
 # continualDataPlot("flour")
@@ -90,9 +89,9 @@ print(y_test)
 #-----------------------------------------------------------------------------------------------------------------------
 #KNN MODEL CREATION
 numOfNeighbours = int(np.round(np.sqrt(data.shape[0]))) - 1
-knnModel = KNeighborsClassifier(n_neighbors=1)
+knnModel = KNeighborsClassifier(n_neighbors=3)
 
-knnModel.fit(X_test, y_test)
+knnModel.fit(X_train, y_train)
 
 predictions = knnModel.predict(X_test)
 ser_pred = pd.Series(data=predictions, name="Predicted", index=X_test.index)
@@ -103,3 +102,4 @@ accuracy = knnModel.score(X_test, y_test)
 
 print("MSE: " + str(mean_squared_error(y_test, predictions)))
 print("Score: " + str(accuracy))
+print("Score with accuracy from sklearn: " + str(accuracy_score(y_test, predictions)))
